@@ -1,0 +1,738 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Seat Booking System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #263238;
+        }
+
+        header {
+            background-color: #17365d;
+            color: white;
+            text-align: center;
+            padding: 22px;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+        }
+
+        nav {
+            background-color: #244b75;
+            padding: 12px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 10px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #ffd166;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 25px auto;
+        }
+
+        .card {
+            background-color: white;
+            padding: 22px;
+            margin-bottom: 22px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px #00000012;
+        }
+
+        h2 {
+            color: #17365d;
+            margin-top: 0;
+        }
+
+        input, select, button {
+            padding: 11px;
+            margin: 6px 4px 6px 0;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        button {
+            background-color: #176b50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #104b38;
+        }
+
+        .seat-map {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(40px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .seat {
+            padding: 16px 5px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        .available {
+            background-color: #27965b;
+        }
+
+        .occupied {
+            background-color: #d94b4b;
+            cursor: not-allowed;
+        }
+
+        .selected {
+            background-color: #e4a11b;
+            outline: 3px solid #17365d;
+        }
+
+        .legend span {
+            display: inline-block;
+            margin: 5px 12px 5px 0;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin-right: 5px;
+        }
+
+        .message {
+            font-weight: bold;
+            margin-top: 12px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat {
+            background-color: #e8f1fa;
+            padding: 18px;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .stat h3 {
+            margin: 5px;
+            color: #17365d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #17365d;
+            color: white;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        footer {
+            background-color: #17365d;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            nav a {
+                display: inline-block;
+                margin: 7px;
+            }
+
+            .seat-map {
+                gap: 6px;
+            }
+
+            .seat {
+                padding: 13px 2px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>📚 Library Seat & Resource Booking</h1>
+    <p>Book your seat. Study comfortably. Save your time.</p>
+</header>
+
+<nav>
+    <a href="#login">Student Login</a>
+    <a href="#seats">Seat Map</a>
+    <a href="#booking">Book Seat</a>
+    <a href="#history">Booking History</a>
+    <a href="#admin">Admin Dashboard</a>
+</nav>
+
+<div class="container">
+
+    <!-- Student Login -->
+    <section class="card" id="login">
+        <h2>Student Login</h2>
+
+        <form id="loginForm">
+            <input type="text" id="studentName"
+                   placeholder="Enter student name" required>
+
+            <input type="text" id="studentId"
+                   placeholder="Enter student ID" required>
+
+            <button type="submit">Login</button>
+            <button type="button" id="logoutBtn"
+                    onclick="logout()">Logout</button>
+        </form>
+
+        <p id="loginMessage" class="message">
+            Please log in to book a seat.
+        </p>
+    </section>
+
+    <!-- Dashboard -->
+    <section class="card">
+        <h2>Library Overview</h2>
+
+        <div class="stats">
+            <div class="stat">
+                <p>Total Seats</p>
+                <h3 id="totalSeats">20</h3>
+            </div>
+
+            <div class="stat">
+                <p>Available Seats</p>
+                <h3 id="availableSeats">20</h3>
+            </div>
+
+            <div class="stat">
+                <p>Occupied Seats</p>
+                <h3 id="occupiedSeats">0</h3>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seat Map -->
+    <section class="card" id="seats">
+        <h2>Visual Seat Map</h2>
+        <p>Select an available seat from the map below.</p>
+
+        <div class="legend">
+            <span><i class="dot" style="background:#27965b"></i>Available</span>
+            <span><i class="dot" style="background:#d94b4b"></i>Occupied</span>
+            <span><i class="dot" style="background:#e4a11b"></i>Selected</span>
+        </div>
+
+        <div class="seat-map" id="seatMap"></div>
+
+        <p id="seatMessage" class="message">
+            No seat selected.
+        </p>
+    </section>
+
+    <!-- Booking Form -->
+    <section class="card" id="booking">
+        <h2>Book a Library Seat</h2>
+
+        <form id="bookingForm">
+            <label for="resource">Resource:</label><br>
+
+            <select id="resource">
+                <option value="Reading Seat">Reading Seat</option>
+                <option value="Reading Room">Reading Room</option>
+                <option value="Computer">Computer</option>
+                <option value="Study Room">Study Room</option>
+            </select>
+
+            <br>
+
+            <label for="bookingDate">Booking Date:</label><br>
+            <input type="date" id="bookingDate" required>
+
+            <br>
+
+            <label for="startTime">Start Time:</label><br>
+            <select id="startTime">
+                <option value="09:00">09:00 AM</option>
+                <option value="10:00">10:00 AM</option>
+                <option value="11:00">11:00 AM</option>
+                <option value="12:00">12:00 PM</option>
+                <option value="13:00">01:00 PM</option>
+                <option value="14:00">02:00 PM</option>
+                <option value="15:00">03:00 PM</option>
+                <option value="16:00">04:00 PM</option>
+            </select>
+
+            <br>
+
+            <label for="duration">Duration:</label><br>
+            <select id="duration">
+                <option value="1">1 hour</option>
+                <option value="2">2 hours</option>
+                <option value="3">3 hours</option>
+            </select>
+
+            <br>
+
+            <button type="submit">Confirm Booking</button>
+        </form>
+
+        <p id="bookingMessage" class="message"></p>
+    </section>
+
+    <!-- Booking History -->
+    <section class="card" id="history">
+        <h2>Booking History</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Resource</th>
+                        <th>Seat</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody">
+                    <tr>
+                        <td colspan="7">No bookings yet.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Admin Dashboard -->
+    <section class="card" id="admin">
+        <h2>Administrator Dashboard</h2>
+        <p>View the current seat status and manage reservations.</p>
+
+        <button type="button" onclick="releaseExpiredSeats()">
+            Release Expired Seats
+        </button>
+
+        <button type="button" onclick="clearAllBookings()">
+            Clear All Bookings
+        </button>
+
+        <p id="adminMessage" class="message"></p>
+    </section>
+
+</div>
+
+<footer>
+    <p>Library Seat & Resource Booking System</p>
+    <p>College Project | HTML, CSS and JavaScript</p>
+</footer>
+
+<script>
+    const total = 20;
+    let selectedSeat = null;
+    let currentStudent = null;
+    let bookings = [];
+    let occupied = new Set();
+
+    const seatMap = document.getElementById("seatMap");
+    const bookingForm = document.getElementById("bookingForm");
+
+    // Set today's date as the minimum booking date.
+    const dateInput = document.getElementById("bookingDate");
+    const today = new Date();
+
+    function localDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    }
+
+    dateInput.min = localDate(today);
+    dateInput.value = localDate(today);
+
+    // Create 20 seats.
+    function createSeats() {
+        seatMap.innerHTML = "";
+
+        for (let i = 1; i <= total; i++) {
+            const seat = document.createElement("button");
+
+            seat.type = "button";
+            seat.className = "seat available";
+            seat.textContent = "S" + i;
+            seat.dataset.seat = i;
+            seat.setAttribute("aria-label", "Seat " + i + ", available");
+
+            seat.addEventListener("click", function () {
+                selectSeat(i);
+            });
+
+            seatMap.appendChild(seat);
+        }
+
+        updateSeatMap();
+    }
+
+    // Student login.
+    document.getElementById("loginForm").addEventListener(
+        "submit", function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById("studentName").value.trim();
+            const id = document.getElementById("studentId").value.trim();
+
+            if (!name || !id) {
+                return;z
+            }
+
+            currentStudent = { name: name, id: id };
+
+            document.getElementById("loginMessage").textContent =
+                "Welcome, " + name + "! You can now book a seat.";
+
+            renderHistory();
+        }
+    );
+
+    // Student logout.
+    function logout() {
+        currentStudent = null;
+        selectedSeat = null;
+
+        document.getElementById("loginMessage").textContent =
+            "You have logged out.";
+
+        document.getElementById("seatMessage").textContent =
+            "No seat selected.";
+
+        updateSeatMap();
+    }
+
+    // Select an available seat.
+    function selectSeat(number) {
+        if (!currentStudent) {
+            document.getElementById("seatMessage").textContent =
+                "Please log in before selecting a seat.";
+            return;
+        }
+
+        const date = dateInput.value;
+        const start = document.getElementById("startTime").value;
+        const duration = Number(document.getElementById("duration").value);
+
+        if (isSeatUnavailable(number, date, start, duration)) {
+            document.getElementById("seatMessage").textContent =
+                "This seat is unavailable for the selected time.";
+            return;
+        }
+
+        selectedSeat = number;
+
+        document.getElementById("seatMessage").textContent =
+            "Selected seat: S" + number;
+
+        updateSeatMap();
+    }
+
+    // Convert a date and time to a timestamp.
+    function getTimestamp(date, time) {
+        return new Date(date + "T" + time + ":00").getTime();
+    }
+
+    // Check whether two booking periods overlap.
+    function overlaps(startA, endA, startB, endB) {
+        return startA < endB && startB < endA;
+    }
+
+    function isSeatUnavailable(seat, date, start, duration) {
+        const startAt = getTimestamp(date, start);
+        const endAt = startAt + duration * 60 * 60 * 1000;
+
+        return bookings.some(function (booking) {
+            if (booking.seat !== seat || booking.status !== "Active") {
+                return false;
+            }
+
+            const existingStart = getTimestamp(
+                booking.date, booking.start
+            );
+
+            const existingEnd = existingStart +
+                booking.duration * 60 * 60 * 1000;
+
+            return overlaps(startAt, endAt, existingStart, existingEnd);
+        });
+    }
+
+    // Update the seat map and dashboard.
+    function updateSeatMap() {
+        const date = dateInput.value;
+        const start = document.getElementById("startTime").value;
+        const duration = Number(document.getElementById("duration").value);
+
+        let availableCount = 0;
+
+        document.querySelectorAll(".seat").forEach(function (seatButton) {
+            const number = Number(seatButton.dataset.seat);
+
+            const unavailable = isSeatUnavailable(
+                number, date, start, duration
+            );
+
+            seatButton.className = "seat";
+            seatButton.disabled = unavailable;
+
+            if (unavailable) {
+                seatButton.classList.add("occupied");
+                seatButton.setAttribute(
+                    "aria-label", "Seat " + number + ", occupied"
+                );
+            } else {
+                seatButton.classList.add("available");
+                availableCount++;
+
+                seatButton.setAttribute(
+                    "aria-label", "Seat " + number + ", available"
+                );
+
+                if (selectedSeat === number) {
+                    seatButton.classList.add("selected");
+                }
+            }
+        });
+
+        document.getElementById("totalSeats").textContent = total;
+        document.getElementById("availableSeats").textContent =
+            availableCount;
+        document.getElementById("occupiedSeats").textContent =
+            total - availableCount;
+    }
+
+    // Confirm a booking.
+    bookingForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const message = document.getElementById("bookingMessage");
+
+        if (!currentStudent) {
+            message.textContent = "Please log in first.";
+            return;
+        }
+
+        if (!selectedSeat) {
+            message.textContent = "Please select a seat from the map.";
+            return;
+        }
+
+        const resource = document.getElementById("resource").value;
+        const date = dateInput.value;
+        const start = document.getElementById("startTime").value;
+        const duration = Number(document.getElementById("duration").value);
+
+        const startAt = getTimestamp(date, start);
+        const endAt = startAt + duration * 60 * 60 * 1000;
+
+        if (startAt <= Date.now()) {
+            message.textContent =
+                "Choose a future booking time.";
+            return;
+        }
+
+        if (isSeatUnavailable(selectedSeat, date, start, duration)) {
+            message.textContent =
+                "This seat has already been booked for that time.";
+            selectedSeat = null;
+            updateSeatMap();
+            return;
+        }
+
+        bookings.push({
+            student: currentStudent.name,
+            studentId: currentStudent.id,
+            resource: resource,
+            seat: selectedSeat,
+            date: date,
+            start: start,
+            duration: duration,
+            endAt: endAt,
+            status: "Active"
+        });
+
+        message.textContent =
+            "Booking confirmed! Your seat is S" + selectedSeat + ".";
+
+        selectedSeat = null;
+
+        updateSeatMap();
+        renderHistory();
+    });
+
+    // Show the booking history.
+    function renderHistory() {
+        const body = document.getElementById("historyBody");
+        body.innerHTML = "";
+
+        const visibleBookings = currentStudent
+            ? bookings.filter(function (booking) {
+                return booking.studentId === currentStudent.id;
+            })
+            : [];
+
+        if (visibleBookings.length === 0) {
+            body.innerHTML =
+                '<tr><td colspan="7">No bookings to display.</td></tr>';
+            return;
+        }
+
+        visibleBookings.forEach(function (booking) {
+            const row = document.createElement("tr");
+
+            const values = [
+                booking.student,
+                booking.resource,
+                "S" + booking.seat,
+                booking.date,
+                booking.start + " (" + booking.duration + " hr)",
+                booking.status
+            ];
+
+            values.forEach(function (value) {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            const actionCell = document.createElement("td");
+            const cancelButton = document.createElement("button");
+
+            cancelButton.textContent = "Cancel";
+            cancelButton.disabled = booking.status !== "Active";
+
+            cancelButton.addEventListener("click", function () {
+                if (booking.status !== "Active") return;
+
+                booking.status = "Cancelled";
+                updateSeatMap();
+                renderHistory();
+            });
+
+            actionCell.appendChild(cancelButton);
+            row.appendChild(actionCell);
+            body.appendChild(row);
+        });
+    }
+
+    // Release bookings after their end time.
+    function releaseExpiredSeats() {
+        let released = 0;
+
+        bookings.forEach(function (booking) {
+            if (booking.status === "Active" &&
+                booking.endAt <= Date.now()) {
+                booking.status = "Expired";
+                released++;
+            }
+        });
+
+        document.getElementById("adminMessage").textContent =
+            released + " expired booking(s) released.";
+
+        updateSeatMap();
+        renderHistory();
+    }
+
+    // Clear bookings for demonstration purposes.
+    function clearAllBookings() {
+        if (!confirm("Delete all bookings?")) return;
+
+        bookings = [];
+        selectedSeat = null;
+
+        document.getElementById("adminMessage").textContent =
+            "All bookings have been cleared.";
+
+        updateSeatMap();
+        renderHistory();
+    }
+
+    // Refresh availability when the date or time changes.
+    dateInput.addEventListener("change", function () {
+        selectedSeat = null;
+        updateSeatMap();
+    });
+
+    document.getElementById("startTime").addEventListener(
+        "change", function () {
+            selectedSeat = null;
+            updateSeatMap();
+        }
+    );
+
+    document.getElementById("duration").addEventListener(
+        "change", function () {
+            selectedSeat = null;
+            updateSeatMap();
+        }
+    );
+
+    // Automatically check expired bookings every 30 seconds.
+    setInterval(releaseExpiredSeats, 30000);
+
+    // Initialize the page.
+    createSeats();
+</script>
+
+</body>
+</html>
