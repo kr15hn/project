@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Seat & Book Management System</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            color: #172554;
+            background: radial-gradient(ellipse at 15% 15%, #315a9c 0%, transparent 40%),
+                        radial-gradient(ellipse at 85% 85%, #452b83 0%, transparent 40%),
+                        linear-gradient(135deg, #080d20, #101d3b, #172d50);
+            background-attachment: fixed;
+        }
+
+        .main-container {
+            max-width: 1150px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 22px;
+            background: linear-gradient(145deg, #f8fbff, #dce8f7);
+            box-shadow: 0 25px 60px rgba(0,0,0,.4);
+        }
+
+        .main-header {
+            text-align: center;
+            padding: 25px;
+            color: white;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #101c3c, #2563eb);
+            box-shadow: 0 10px 25px rgba(15,23,42,.35);
+            margin-bottom: 25px;
+        }
+
+        .login-section {
+            max-width: 500px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.15);
+        }
+
+        .login-title {
+            text-align: center;
+            color: #1e40af;
+        }
+
+        .login-desc {
+            text-align: center;
+            color: #64748b;
+        }
+
+        .form-label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .form-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin: 10px 0 18px;
+            border: 1px solid #94a3b8;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .form-select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin: 10px 0 18px;
+            border-radius: 8px;
+            border: 1px solid #94a3b8;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            border: none;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: #e0e7ff;
+            color: #1e40af;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-danger {
+            padding: 9px 18px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .login-message {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .demo-details {
+            font-size: 12px;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .user-bar {
+            background: #dbeafe;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            margin-top: 0;
+        }
+
+        .card-subtext {
+            color: #64748b;
+            margin-top: 0;
+        }
+
+        .legend-text {
+            color: #64748b;
+        }
+
+        .seat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+            gap: 15px;
+        }
+
+        .selected-seat-text {
+            font-weight: bold;
+            color: #1d4ed8;
+            margin-top: 15px;
+        }
+
+        .book-search-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            box-sizing: border-box;
+            padding: 12px;
+            border: 1px solid #94a3b8;
+            border-radius: 8px;
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .search-select {
+            width: 180px;
+            box-sizing: border-box;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #94a3b8;
+            margin: 0;
+        }
+
+        .table-scroll-container {
+            overflow-x: auto;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .table-header-row {
+            background: #dbeafe;
+        }
+
+        .styled-table th {
+            padding: 12px;
+        }
+
+        .styled-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .admin-title {
+            color: #172554;
+        }
+
+        .admin-subtitle {
+            color: #64748b;
+        }
+
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            border-radius: 13px;
+            text-align: center;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.06);
+        }
+
+        .stat-h1 {
+            margin: 0 0 5px;
+        }
+
+        .page-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #64748b;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <header class="main-header">
+            <h1>📚 Library Seat & Book System</h1>
+            <p>Smart Library Management System</p>
+        </header>
+
+        <!-- LOGIN SECTION -->
+        <section id="loginSection" class="login-section">
+            <h2 id="loginTitle" class="login-title">🎓 Student Login</h2>
+            <p id="loginDescription" class="login-desc">Enter Student ID and Registration Number</p>
+
+            <label class="form-label">Student ID / Admin ID</label>
+            <input id="loginId" type="text" placeholder="Enter ID" class="form-input">
+
+            <label class="form-label">Registration Number / Admin Password</label>
+            <input id="loginPassword" type="password" placeholder="Enter details" class="form-input">
+
+            <button onclick="login()" class="btn-primary">Login</button>
+
+            <p id="loginMessage" class="login-message"></p>
+
+            <button id="switchLogin" onclick="switchMode()" class="btn-secondary">Login as Admin</button>
+
+            <p id="demoDetails" class="demo-details">Student Demo: STU001 / 12605648</p>
+        </section>
+
+        <!-- STUDENT DASHBOARD -->
+        <div id="studentDashboard" style="display:none;">
+            <div class="user-bar">
+                <div><b>Student:</b> <span id="studentWelcome"></span></div>
+                <button onclick="logout()" class="btn-danger">Logout</button>
+            </div>
+
+            <!-- SEAT BOOKING SECTION -->
+            <section class="card-section">
+                <h2 class="card-title">Seat Booking Details</h2>
+                <label class="form-label">Select Time Slot:</label>
+                <select id="timeSlot" class="form-select">
+                    <option>09:00 AM - 11:00 AM</option>
+                    <option>11:00 AM - 01:00 PM</option>
+                    <option>01:00 PM - 03:00 PM</option>
+                    <option>03:00 PM - 05:00 PM</option>
+                </select>
+
+                <label class="form-label">Select Booking Duration:</label>
+                <select id="duration" class="form-select">
+                    <option value="1">1 Minute (Demo)</option>
+                    <option value="60">1 Hour</option>
+                    <option value="120">2 Hours</option>
+                </select>
+            </section>
+
+            <section class="card-section">
+                <h2 class="card-title">Select Your Seat</h2>
+                <p class="legend-text">🟢 Available &nbsp; 🔵 Selected &nbsp; 🔴 Booked</p>
+                <div id="seatContainer" class="seat-grid"></div>
+                <p id="selectedSeat" class="selected-seat-text">Selected Seat: None</p>
+                <button onclick="confirmBooking()" class="btn-primary">Confirm Seat Booking</button>
+            </section>
+
+            <!-- BOOK ISSUE & SEARCH SECTION -->
+            <section class="card-section">
+                <h2 class="card-title">📚 Library Book Catalog & Issue</h2>
+                <p class="card-subtext">Search books by title or author, choose duration, and issue them instantly.</p>
+                
+                <div class="book-search-row">
+                    <input id="bookSearchInput" type="text" placeholder="🔍 Search book by title or author..." onkeyup="filterBooks()" class="search-input">
+                    <select id="bookDuration" class="search-select">
+                        <option value="1">1 Min (Demo)</option>
+                        <option value="60">1 Hour</option>
+                        <option value="120">2 Hours</option>
+                        <option value="300">5 Hours</option>
+                        <option value="420">7 Hours</option>
+                        <option value="540">9 Hours</option>
+                        <option value="660">11 Hours</option>
+                        <option value="720">12Hours</option>
+                        <option value="1440">1day</option>
+                        <option value="7200">5day</option>
+                        <option value="14400">10day</option>
+                        <option value="43800">1month</option>
+                        
+                    </select>
+                </div>
+                
+                <div class="table-scroll-container">
+                    <table class="styled-table">
+                        <thead>
+                            <tr class="table-header-row">
+                                <th>ID</th>
+                                <th>Book Title</th>
+                                <th>Author</th>
+                                <th>Available Copies</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookCatalogBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- MY ISSUED BOOKS -->
+            <section class="card-section">
+                <h2 class="card-title">📖 My Issued Books</h2>
+                <div class="table-scroll-container">
+                    <table class="styled-table">
+                        <thead>
+                            <tr class="table-header-row">
+                                <th>Book Title</th>
+                                <th>Issue Time</th>
+                                <th>End Time</th>
+                                <th>Time Left</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myIssuedBooksBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="card-section">
+                <h2 class="card-title">⏳ My Active Seat Booking</h2>
+                <div id="myCountdown" class="table-scroll-container">No active booking.</div>
+            </section>
+
+            <section class="card-section">
+                <h2 class="card-title">Seat Booking History</h2>
+                <div class="table-scroll-container">
+                    <table class="styled-table">
+                        <thead>
+                            <tr class="table-header-row">
+                                <th>Seat</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myHistory"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ADMIN DASHBOARD -->
+        <div id="adminDashboard" style="display:none;">
+            <div class="user-bar">
+                <div><b>Welcome, Library Admin</b></div>
+                <button onclick="logout()" class="btn-danger">Logout</button>
+            </div>
+
+            <h2 class="admin-title">📊 Admin Dashboard</h2>
+            <p class="admin-subtitle">Live library admission and booking overview</p>
+
+            <div class="admin-stats-grid">
+                <div class="stat-card" style="background:#dbeafe;"><h1 id="adminTotal" class="stat-h1">30</h1><b>Total Seats</b></div>
+                <div class="stat-card" style="background:#dcfce7;"><h1 id="adminInside" class="stat-h1">0</h1><b>Students in Library</b></div>
+                <div class="stat-card" style="background:#fef3c7;"><h1 id="adminAdmissions" class="stat-h1">0</h1><b>Total Admissions</b></div>
+                <div class="stat-card" style="background:#ede9fe;"><h1 id="adminAvailable" class="stat-h1">30</h1><b>Available Seats</b></div>
+                <div class="stat-card" style="background:#fee2e2;"><h1 id="adminBooked" class="stat-h1">0</h1><b>Booked Seats</b></div>
+            </div>
+
+            <section class="card-section">
+                <h2 class="card-title">👨‍🎓 Students Currently in Library</h2>
+                <p class="card-subtext">All active student bookings with entry and exit timings.</p>
+                <div id="adminActiveTable" class="table-scroll-container"></div>
+            </section>
+
+            <section class="card-section">
+                <h2 class="card-title">📋 Complete Admission History</h2>
+                <div class="table-scroll-container">
+                    <table class="styled-table">
+                        <thead>
+                            <tr class="table-header-row">
+                                <th>Student ID</th>
+                                <th>Registration</th>
+                                <th>Seat</th>
+                                <th>Entry Time</th>
+                                <th>Exit Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminHistory"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <footer class="page-footer">
+            Library Seat & Book Management System | Internal CSS Architecture
+        </footer>
+    </div>
+
+<script src="script.js"></script>
+</body>
+</html>
